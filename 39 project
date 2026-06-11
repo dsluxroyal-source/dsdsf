@@ -1,0 +1,45 @@
+import speech_recognition as sr
+import smtplib
+print("=== Voice-Controlled Email Sender ===")
+recognizer = sr.Recognizer()
+def listen():
+    with sr.Microphone() as source:
+        print("Listening...")
+        audio = recognizer.listen(source)
+        try:
+            text = recognizer.recognize_google(audio)
+            print("You said:", text)
+            return text
+        except:
+            return ""
+sender_email = input("Enter your email: ")
+password = input("Enter your password: ")
+receiver_email = input("Enter receiver email: ")
+while True:
+    print("\nSay the email subject.")
+    subject = listen()
+    if subject.lower() == "exit":
+        print("Goodbye!")
+        break
+    print("\nSay the email message.")
+    message = listen()
+    if message.lower() == "exit":
+        print("Goodbye!")
+        break
+    email_text = f"Subject: {subject}\n\n{message}"
+    try:
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        server.login(
+            sender_email,
+            password
+        )
+        server.sendmail(
+            sender_email,
+            receiver_email,
+            email_text
+        )
+        server.quit()
+        print("Email sent successfully!")
+    except Exception as e:
+        print("Error:", e)
